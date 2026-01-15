@@ -1,12 +1,17 @@
-import Navbar from '@/components/ui/navbar';
 import React from 'react';
-import { DashboardLayoutProps } from '../(DashboardLayout)/layout';
+import Navbar from '@/components/ui/navbar';
 
-const CommonLayout = ({children}:DashboardLayoutProps) => {
+type CommonLayoutProps = {
+  children: React.ReactNode;
+};
+
+const CommonLayout = ({ children }: CommonLayoutProps) => {
     return (
-        <div>
-             <Navbar/>
-             <div>{children}</div>
+        <div className="min-h-screen flex flex-col">
+             <Navbar />
+             <main className="flex-1">
+                {children}
+             </main>
         </div>
     );
 };

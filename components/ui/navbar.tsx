@@ -28,6 +28,7 @@ const routes = [
   { title: "Blogs", href: "/blogs" },
   { title: "About", href: "/about" },
   { title: "Contact", href: "/contact" },
+  { title: "Dashboard", href: "/dashboard" },
 ];
 
 export default function Navbar() {
