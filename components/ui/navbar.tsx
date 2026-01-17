@@ -71,10 +71,10 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <ModeToggle />
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/sign-in">Sign In</Link>
+            <Link href="/logIn">Sign In</Link>
           </Button>
           <Button size="sm" className="rounded-full shadow-md px-6" asChild>
-            <Link href="/sign-up">Get Started</Link>
+            <Link href="/register">Register</Link>
           </Button>
         </div>
 
