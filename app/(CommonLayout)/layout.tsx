@@ -1,4 +1,5 @@
 import  Navbar  from "@/components/ui/navbar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function CommonLayout({
   children,
@@ -9,6 +10,7 @@ export default function CommonLayout({
     <div>
       <Navbar />
       {children}
+      <Toaster richColors  />
     </div>
   );
 }

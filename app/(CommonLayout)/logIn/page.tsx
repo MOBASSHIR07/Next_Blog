@@ -3,18 +3,55 @@
 import Link from "next/link";
 import { Squirrel, Github, Chrome } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { useForm } from "@tanstack/react-form";
+import * as z from "zod";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+const loginSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export default function LoginPage() {
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        const toastId = toast.loading("Signing in...");
+        const { data, error } = await authClient.signIn.email({
+          email: value.email,
+          password: value.password,
+          callbackURL: "/dashboard",
+        });
 
+        if (error) {
+          toast.error(error.message, { id: toastId });
+          return;
+        }
 
- const signIn = async()=>{
-    const data = await authClient.signIn.social({
-    provider: "google",
-    callbackURL:"http://localhost:4000"
+        toast.success("Welcome back!", { id: toastId });
+      } catch (err) {
+        toast.error("Something went wrong!");
+      }
+    },
   });
- }
 
-
+  const handleSocialSignIn = async (provider: "google" | "github") => {
+    try {
+      await authClient.signIn.social({
+        provider,
+        callbackURL: "/dashboard",
+      });
+    } catch (err) {
+      toast.error(`Failed to sign in with ${provider}`);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -27,49 +64,109 @@ export default function LoginPage() {
       </div>
 
       <div className="p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl">
-        {/* Social Logins */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <button onClick={signIn} className="flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-800 h-11 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm">
-            <Chrome className="h-4 w-4 text-red-500" /> Google
-          </button>
-          <button className="flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-800 h-11 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm">
-            <Github className="h-4 w-4" /> Github
-          </button>
+          <Button
+            variant="outline"
+            onClick={() => handleSocialSignIn("google")}
+            className="rounded-xl h-11"
+          >
+            <Chrome className="h-4 w-4 text-red-500 mr-2" /> Google
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleSocialSignIn("github")}
+            className="rounded-xl h-11"
+          >
+            <Github className="h-4 w-4 mr-2" /> Github
+          </Button>
         </div>
 
         <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100 dark:border-slate-800" /></div>
-          <div className="relative flex justify-center text-xs uppercase"><span className="bg-white dark:bg-slate-900 px-3 text-slate-400">Or email</span></div>
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-slate-100 dark:border-slate-800" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white dark:bg-slate-900 px-3 text-slate-400">
+              Or email
+            </span>
+          </div>
         </div>
 
-        <form className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold ml-1">Email</label>
-            <input
-              placeholder="name@example.com"
-              type="email"
-              className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50/30 dark:bg-slate-950 px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition-all"
-            />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between px-1">
-              <label className="text-sm font-semibold">Password</label>
-              <Link href="#" className="text-xs text-primary hover:underline font-medium">Forgot?</Link>
-            </div>
-            <input
-              type="password"
-              className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50/30 dark:bg-slate-950 px-4 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none transition-all"
-            />
-          </div>
-          <button className="w-full bg-primary text-primary-foreground h-11 rounded-xl font-bold hover:opacity-90 transition-all shadow-md">
-            Sign In
-          </button>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="space-y-4"
+        >
+          <form.Field
+            name="email"
+            validators={{ onChange: loginSchema.shape.email }}
+            children={(field) => (
+              <div className="space-y-1">
+                <Label className="text-sm font-semibold ml-1">Email</Label>
+                <Input
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="name@example.com"
+                  className="rounded-xl h-11"
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-red-500 ml-1">
+                    {(field.state.meta.errors[0])?.message}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+
+          <form.Field
+            name="password"
+            validators={{ onChange: loginSchema.shape.password }}
+            children={(field) => (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between px-1">
+                  <Label className="text-sm font-semibold">Password</Label>
+                  <Link href="#" className="text-xs text-primary hover:underline font-medium">
+                    Forgot?
+                  </Link>
+                </div>
+                <Input
+                  type="password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="••••••••"
+                  className="rounded-xl h-11"
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-xs text-red-500 ml-1">
+                    {(field.state.meta.errors[0]?.message)}
+                  </p>
+                )}
+              </div>
+            )}
+          />
+
+          <form.Subscribe
+            selector={(state) => [state.isSubmitting]}
+            children={([isSubmitting]) => (
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-11 rounded-xl font-bold shadow-md"
+              >
+                {isSubmitting ? "Signing in..." : "Sign In"}
+              </Button>
+            )}
+          />
         </form>
       </div>
 
       <p className="text-center text-sm text-slate-500">
         New here?{" "}
-        <Link href="/register" className="font-bold text-primary hover:underline">Create an account</Link>
+        <Link href="/register" className="font-bold text-primary hover:underline">
+          Create an account
+        </Link>
       </p>
     </div>
   );

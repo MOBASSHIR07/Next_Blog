@@ -4,24 +4,28 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form"
 import * as z from "zod"
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+
+
 
 export default function RegisterPage() {
 
 
   // zod 1 schema
   const registerSchema = z.object({
-  fullName: z.string()
-    .min(1, "Name is required")
-    .min(4, "Minimum 4 characters")
-    .refine((val) => !/\d/.test(val), "Numbers not allowed"),
-  email: z.string()
-    .min(1, "Email is required")
-    .email("Invalid email address"),
-  password: z.string()
-    .min(8, "Minimum 8 characters")
-    .regex(/[A-Z]/, "One uppercase required")
-    .regex(/[0-9]/, "One number required"),
-});
+    fullName: z.string()
+      .min(1, "Name is required")
+      .min(4, "Minimum 4 characters")
+      .refine((val) => !/\d/.test(val), "Numbers not allowed"),
+    email: z.string()
+      .min(1, "Email is required")
+      .email("Invalid email address"),
+    password: z.string()
+      .min(8, "Minimum 8 characters")
+      .regex(/[A-Z]/, "One uppercase required")
+      .regex(/[0-9]/, "One number required"),
+  });
 
 
 
@@ -34,9 +38,26 @@ export default function RegisterPage() {
       email: "",
       password: "",
     },
+   
     onSubmit: async ({ value }) => {
 
-      console.log("Submit kora holo:", value);
+      try {
+        const toastId = toast.loading("Creating User")
+        const { data, error } = await authClient.signUp.email({
+          email: value.email,
+          password: value.password,
+          name: value.fullName,
+        })
+
+        if (error) {
+          toast.error(error.message, { id: toastId })
+          return
+        }
+
+        toast.success("User Created Successfully", { id: toastId })
+      } catch (error) {
+        toast.error("Some Thing went Wrong !!")
+      }
     },
   });
 
@@ -55,7 +76,7 @@ export default function RegisterPage() {
       <form.Field
         name="fullName"
 
-        validators={{ onChange:registerSchema.shape.fullName}}
+        validators={{ onChange: registerSchema.shape.fullName }}
 
         children={(field) => (
           <div className="space-y-1">
@@ -79,7 +100,7 @@ export default function RegisterPage() {
       {/* 3.1 akekta input field */}
       <form.Field
         name="email"
-        validators={{ onChange:registerSchema.shape.email}}
+        validators={{ onChange: registerSchema.shape.email }}
         children={(field) => (
           <div className="space-y-1">
             <Label className="text-sm font-semibold ml-1">Email</Label>
@@ -91,7 +112,7 @@ export default function RegisterPage() {
               className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50/30 dark:bg-slate-950 px-4 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
             />
 
-             {field.state.meta.errors.length > 0 && (
+            {field.state.meta.errors.length > 0 && (
               <p className="text-xs text-red-500 ml-1">
                 {field.state.meta.errors[0]?.message}
               </p>
@@ -103,7 +124,7 @@ export default function RegisterPage() {
       <form.Field
 
         name="password"
-        validators={{ onChange:registerSchema.shape.password}}
+        validators={{ onChange: registerSchema.shape.password }}
         children={(field) => (
           <div className="space-y-1">
             <Label className="text-sm font-semibold ml-1">Password</Label>
@@ -115,7 +136,7 @@ export default function RegisterPage() {
               placeholder="password"
               className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50/30 dark:bg-slate-950 px-4 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
             />
-             {field.state.meta.errors.length > 0 && (
+            {field.state.meta.errors.length > 0 && (
               <p className="text-xs text-red-500 ml-1">
                 {field.state.meta.errors[0]?.message}
               </p>
