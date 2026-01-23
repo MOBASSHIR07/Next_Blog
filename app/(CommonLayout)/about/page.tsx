@@ -1,22 +1,21 @@
 "use client"
 
-import { postService } from '@/service/post.Service';
+
 import React, { useEffect, useState } from 'react';
 import { BlogPost } from '../page';
 import { getBlogs } from '@/actions/blog.action';
 
 const AboutPage = () => {
-    // ডাটা সেভ করার জন্য স্টেট
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // 🔥 IIFE (Immediately Invoked Function Expression)
+        //  IIFE (Immediately Invoked Function Expression)
         (async () => {
             try {
                 const { data } = await getBlogs();
                 
-                // আপনার সার্ভিস অনুযায়ী: { data: { data: [] } }
+               
                 if (data && data.data) {
                     setBlogs(data.data);
                 }
@@ -25,7 +24,7 @@ const AboutPage = () => {
             } finally {
                 setLoading(false);
             }
-        })(); // এখানে ফাংশনটি সাথে সাথে কল হচ্ছে
+        })(); 
     }, []);
 
     if (loading) return <div className='p-10'>Loading blogs...</div>;
