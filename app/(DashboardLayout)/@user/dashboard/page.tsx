@@ -1,11 +1,6 @@
-import React from 'react';
-
+import { redirect } from 'next/navigation';
 const Dashboard = () => {
-    return (
-        <div>
-            <h1>User dashboard</h1>
-        </div>
-    );
+    return redirect("dashboard/create-post")
 };
 
 export default Dashboard;

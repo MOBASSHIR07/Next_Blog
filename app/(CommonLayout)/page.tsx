@@ -1,4 +1,4 @@
-import BlogCard from "@/components/BlogCard"; // সরাসরি components ফোল্ডার থেকে ইমপোর্ট
+import BlogCard from "@/components/BlogCard"; 
 import { postService } from "@/service/post.Service";
 export interface BlogPost {
   id: string | number;

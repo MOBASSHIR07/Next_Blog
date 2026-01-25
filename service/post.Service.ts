@@ -37,8 +37,11 @@ export const postService = {
       if (options?.revalidate) {
         config.next = { revalidate: options.revalidate };
       }
-
+        config.next = {...config.next , tags:["blogpost"]}
       const res = await fetch(url.toString(), config);
+      // const res = await fetch(url.toString(), next:{
+      // tags:["blogpost"]
+  //    });
 
       if (!res.ok) {
         throw new Error("Failed to fetch posts");

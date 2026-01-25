@@ -21,17 +21,17 @@ import {
 } from "@/components/ui/sidebar"
 
 const menuItems = {
-  admin: [
+  ADMIN: [
     { title: "Admin Panel", url: "/dashboard/admin", icon: Users },
     { title: "Analytics", url: "/dashboard/analytics", icon: PenTool },
   ],
-  user: [
+  USER: [
     { title: "My Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "Settings", url: "/dashboard/settings", icon: Settings },
+    { title: "Create Post", url: "/dashboard/create-post", icon: Settings },
   ],
 }
 
-export function AppSidebar({ role }: { role: "admin" | "user" }) {
+export function AppSidebar({ role }: { role: "ADMIN" | "USER" }) {
   const links = menuItems[role]
 
   return (
