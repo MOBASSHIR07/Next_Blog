@@ -1,3 +1,5 @@
+import { PostBlog } from "@/actions/blog.action";
+import { BlogPost } from "@/components/BlogCard";
 import { env } from "@/env";
 
 const API_URL = env.API_URL;
@@ -78,6 +80,33 @@ export const postService = {
     }
   },
 
+
+  createPost: async function (payload:PostBlog) {
+    try {
+    
+      const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/posts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cookie": cookieStore.toString(), 
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { data: null, error: { message: data.message || "Failed to create post" } };
+      }
+
+      return { data: data.data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Server Connection Error" } };
+    }
+  }
 
 
 

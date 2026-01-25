@@ -1,4 +1,5 @@
-import CreateBlog from '@/components/Modules/user/CreateBlog';
+
+import CreateBlogClient from '@/components/Modules/user/CreateBlogClient';
 import { postService } from '@/service/post.Service';
 import React from 'react';
 export interface BlogPost {
@@ -15,11 +16,12 @@ export interface BlogPost {
 }
 
 const CreatePost = async () => {
-    const { data } = await postService.getBlogPosts()
+    const { data } = await postService.getBlogPosts({} , {cache:"no-cache"})
 
     return (
         <div>
-            <CreateBlog />
+            {/* <CreateBlog />  // flow-> SSG to SeverSide Rendering  */} 
+            <CreateBlogClient/>
             {data?.data.map((item: BlogPost) => (
                 <div key={item.id}>
                     <h2>{item.title}</h2>
