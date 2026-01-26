@@ -6,7 +6,8 @@ import {
   LayoutDashboard, 
   PenTool, 
  
-  Users, Settings
+  Users, Settings,
+  History
  
 } from "lucide-react"
 
@@ -28,6 +29,7 @@ const menuItems = {
   USER: [
     { title: "My Dashboard", url: "/dashboard", icon: LayoutDashboard },
     { title: "Create Post", url: "/dashboard/create-post", icon: Settings },
+        { title: "History", url: "/dashboard/history", icon: History }
   ],
 }
 
